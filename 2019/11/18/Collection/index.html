@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,集合," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、为啥需要集合？ Java是一门面向对象的语言，就免不了处理对象 为了方便操作多个对象，那么我们就得把这多个对象存储起来 想要存储多个对象(变量),很容易就能想到一个容器 常用的容器我们知道有–&amp;gt;StringBuffer,数组(虽然有对象数组，但是数组的长度是不可变的！) 所以，Java就为我们提供了集合(Collection)～  二、数组和集合的区别 1:长度的区别   数组的长度固定">
+<meta name="keywords" content="java,集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Collection">
+<meta property="og:url" content="&#x2F;2019&#x2F;11&#x2F;18&#x2F;Collection&#x2F;index.html">
+<meta property="og:site_name" content="ChrisPeng Blog">
+<meta property="og:description" content="一、为啥需要集合？ Java是一门面向对象的语言，就免不了处理对象 为了方便操作多个对象，那么我们就得把这多个对象存储起来 想要存储多个对象(变量),很容易就能想到一个容器 常用的容器我们知道有–&amp;gt;StringBuffer,数组(虽然有对象数组，但是数组的长度是不可变的！) 所以，Java就为我们提供了集合(Collection)～  二、数组和集合的区别 1:长度的区别   数组的长度固定">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;18&#x2F;Collection&#x2F;img&#x2F;collection_1.png">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;18&#x2F;Collection&#x2F;img&#x2F;collection_02.png">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;18&#x2F;Collection&#x2F;img&#x2F;collection_03.png">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;18&#x2F;Collection&#x2F;img&#x2F;collection_04.png">
+<meta property="og:updated_time" content="2019-11-18T12:32:54.542Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="&#x2F;2019&#x2F;11&#x2F;18&#x2F;Collection&#x2F;img&#x2F;collection_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="/2019/11/18/Collection/"/>
+
+
+
+
+
+  <title>Collection | ChrisPeng Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ChrisPeng Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">爱生活 爱编程</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="/2019/11/18/Collection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Peng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChrisPeng Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Collection</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-18T19:46:36+08:00">
+                2019-11-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%BA%90%E7%A0%81/" itemprop="url" rel="index">
+                    <span itemprop="name">源码</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.3k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="一、为啥需要集合？"><a href="#一、为啥需要集合？" class="headerlink" title="一、为啥需要集合？"></a><strong>一、为啥需要集合？</strong></h4><ol>
+<li>Java是一门面向对象的语言，就免不了处理对象</li>
+<li>为了方便操作多个对象，那么我们就得把这多个对象存储起来</li>
+<li>想要存储多个对象(变量),很容易就能想到一个<strong>容器</strong></li>
+<li>常用的容器我们知道有–&gt;StringBuffer,数组(虽然有对象数组，但是数组的长度是不可变的！)</li>
+<li>所以，Java就为我们提供了集合(Collection)～</li>
+</ol>
+<h4 id="二、数组和集合的区别"><a href="#二、数组和集合的区别" class="headerlink" title="二、数组和集合的区别"></a><strong>二、数组和集合的区别</strong></h4><ul>
+<li><p>1:长度的区别</p>
+</li>
+<li><ul>
+<li><strong>数组的长度固定</strong></li>
+<li><strong>集合的长度可变</strong></li>
+</ul>
+</li>
+<li><p>2:内容不容</p>
+</li>
+<li><ul>
+<li>数组存储的是同一种类型的元素</li>
+<li>集合可以存储不同类型的元素(但是一般我们不这样干..)</li>
+</ul>
+</li>
+<li><p>3:元素的数据类型</p>
+</li>
+<li><ul>
+<li>数组可以存储基本数据类型,也可以存储引用类型</li>
+<li><strong>集合只能存储引用类型(你存储的是简单的int，它会自动装箱成Integer)</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="三、Collection的由来与功能"><a href="#三、Collection的由来与功能" class="headerlink" title="三、Collection的由来与功能"></a><strong>三、Collection的由来与功能</strong></h4><ul>
+<li><p>集合可以存储多个元素,但我们<strong>对多个元素也有不同的需求</strong></p>
+</li>
+<li><ul>
+<li>多个元素,不能有相同的</li>
+<li>多个元素,能够按照某个规则排序</li>
+</ul>
+</li>
+<li><p>针对不同的需求：java就提供了很多集合类，多个集合类的数据结构不同。但是，结构不重要，重要的是<strong>能够存储东西,能够判断,获取</strong></p>
+</li>
+<li><p>把集合<strong>共性的内容不断往上提取</strong>,最终形成集合的继承体系—-&gt;Collection</p>
+</li>
+</ul>
+<p><img src="img/collection_1.png" alt="img"></p>
+<h4 id="四、Collection的基础功能"><a href="#四、Collection的基础功能" class="headerlink" title="四、Collection的基础功能"></a><strong>四、Collection的基础功能</strong></h4><p><img src="img/collection_02.png" alt="img"></p>
+<p>功能介绍:</p>
+<p>1、添加功能：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">add</span><span class="params">(E e)</span></span>; <span class="comment">//添加一个元素 </span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">addAll</span><span class="params">(Collection&lt;? extends E&gt; c)</span></span>; <span class="comment">//添加一个集合</span></span><br></pre></td></tr></table></figure>
+
+<p>2、删除功能：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span></span>;<span class="comment">//清除所有元素 </span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">remove</span><span class="params">(Object o)</span></span>;<span class="comment">//删除一个元素 </span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">removeAll</span><span class="params">(Collection&lt;?&gt; c)</span></span>;<span class="comment">//移除一个集合的元素，只要有一个元素被移除就返回true </span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">removeIf</span><span class="params">(Predicate&lt;? <span class="keyword">super</span> E&gt; filter)</span><span class="comment">//根据过滤器删除，只要有一个元素被移除就返回true</span></span></span><br></pre></td></tr></table></figure>
+
+<p>3、判断功能</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object o)</span></span>;<span class="comment">//集合中是否存在该元素 </span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">containsAll</span><span class="params">(Collection&lt;?&gt; c)</span></span>;<span class="comment">//是否包含该集合，全部包含才返回true </span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span></span>;<span class="comment">//对象比较 boolean isEmpty();//是否存在元素 </span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">retainAll</span><span class="params">(Collection&lt;?&gt; c)</span></span>;<span class="comment">//交集功能，将本身集合与传进来的集合进行交集处理，并把两个集合中交集部分赋值给本身，如果集合发生改变返回true，否则false </span></span><br><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">public static void main(String []args) &#123;    </span></span><br><span class="line"><span class="comment">Collection list1 = new ArrayList();    </span></span><br><span class="line"><span class="comment">list1.add("q1");   </span></span><br><span class="line"><span class="comment">list1.add("q2");    </span></span><br><span class="line"><span class="comment">list1.add("q3");     </span></span><br><span class="line"><span class="comment">list1.add("q4");    </span></span><br><span class="line"><span class="comment">Collection list2 = new ArrayList();     </span></span><br><span class="line"><span class="comment">list2.add("q1");     </span></span><br><span class="line"><span class="comment">list2.add("q2");   </span></span><br><span class="line"><span class="comment">list2.add("q3");  </span></span><br><span class="line"><span class="comment">list2.add("q5");              </span></span><br><span class="line"><span class="comment">System.out.println("retainAll:" + list1.retainAll(list2));      </span></span><br><span class="line"><span class="comment">System.out.println("list1:" + list1);     </span></span><br><span class="line"><span class="comment">System.out.println("list2:" + list2);      </span></span><br><span class="line"><span class="comment">结果:        </span></span><br><span class="line"><span class="comment">retainAll:true    </span></span><br><span class="line"><span class="comment">list1:[q1, q2, q3]        </span></span><br><span class="line"><span class="comment">list2:[q1, q2, q3, q5]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>4、获取功能</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Iterator&lt;E&gt; <span class="title">iterator</span><span class="params">()</span></span>;<span class="comment">//迭代器获取</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">size</span><span class="params">()</span></span>;<span class="comment">//元素个数获取 </span></span><br><span class="line">Object[] toArray();<span class="comment">//返回集合元素的数组 </span></span><br><span class="line">&lt;T&gt; T[] toArray(T[] a);<span class="comment">//根据泛型返回对应的类型数组</span></span><br></pre></td></tr></table></figure>
+
+<p>5、jdk1.8新增方法说明</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Spliterator&lt;E&gt; <span class="title">spliterator</span><span class="params">()</span></span>;<span class="comment">//返回并行遍历数据源中的元素而设计的迭代器与Iterator对比一个是顺序遍历，一个是并行遍历 </span></span><br><span class="line"><span class="function">Stream&lt;E&gt; <span class="title">parallelStream</span><span class="params">()</span></span>;<span class="comment">//返回并行流</span></span><br><span class="line"><span class="function">Stream&lt;E&gt; <span class="title">stream</span><span class="params">()</span></span>;<span class="comment">//返回有序流</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="五、Collection的Iterator"><a href="#五、Collection的Iterator" class="headerlink" title="五、Collection的Iterator"></a><strong>五、Collection的Iterator</strong></h4><p>Iterator也是一个接口，它只有三个方法：</p>
+<ul>
+<li>hasNext()</li>
+<li>next()</li>
+<li>remove()</li>
+</ul>
+<p>我们<strong>遍历集合(Collection)的元素都可以使用Iterator</strong>，至于它的具体实现是以内部类的方式实现的！</p>
+<h4 id="六、Collection主要集合类型：Set和List"><a href="#六、Collection主要集合类型：Set和List" class="headerlink" title="六、Collection主要集合类型：Set和List"></a><strong>六、Collection主要集合类型：Set和List</strong></h4><p><strong>List集合的特点</strong>就是：<strong>有序(存储顺序和取出顺序一致),可重复</strong></p>
+<p><img src="img/collection_03.png" alt="img"></p>
+<p>对比Collection接口，List扩展了11个方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> index, E element)</span></span>;<span class="comment">//在index位置插入元素</span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">addAll</span><span class="params">(<span class="keyword">int</span> index, Collection&lt;? extends E&gt; c)</span></span>;<span class="comment">//在index位置插入集合</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">indexOf</span><span class="params">(Object o)</span></span>;<span class="comment">//返回第一个出现的元素的位置</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">lastIndexOf</span><span class="params">(Object o)</span></span>;<span class="comment">//返回最后一个出现的元素的位置</span></span><br><span class="line"><span class="function">ListIterator&lt;E&gt; <span class="title">listIterator</span><span class="params">()</span></span>;<span class="comment">//返回一个ListListIterator</span></span><br><span class="line"><span class="function">ListIterator&lt;E&gt; <span class="title">listIterator</span><span class="params">(<span class="keyword">int</span> index)</span></span>;<span class="comment">//返回从index到集合结尾的新元素集合的ListListIterator</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">replaceAll</span><span class="params">(UnaryOperator&lt;E&gt; operator)</span></span>;<span class="comment">//元素替换</span></span><br><span class="line"><span class="function">E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span></span>;<span class="comment">//替换index位置的元素</span></span><br><span class="line">sort(Comparator&lt;? <span class="keyword">super</span> E&gt; c);<span class="comment">//排序</span></span><br><span class="line"><span class="function">List&lt;E&gt; <span class="title">subList</span><span class="params">(<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex)</span></span>;<span class="comment">//从集合中截取fromIndex到toIndex放到新的集合，并返回</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>ListIterator可以往前遍历，添加元素，设置元素</strong></p>
+<p><strong>List集合常用子类</strong></p>
+<p>List集合常用的子类有三个：</p>
+<ul>
+<li><p>ArrayList</p>
+</li>
+<li><ul>
+<li>底层数据结构是数组。线程不安全</li>
+</ul>
+</li>
+<li><p>LinkedList</p>
+</li>
+<li><ul>
+<li>底层数据结构是链表。线程不安全</li>
+</ul>
+</li>
+<li><p>Vector</p>
+</li>
+<li><ul>
+<li>底层数据结构是数组。线程安全</li>
+</ul>
+</li>
+</ul>
+<p><strong>Set集合的特点是</strong>：<strong>元素不可重复</strong></p>
+<p><img src="img/collection_04.png" alt="img"></p>
+<p>从Set集合的方法我们可以看到：方法和Collection差不多多</p>
+<p><strong>Set集合常用子类</strong></p>
+<ul>
+<li><p>HashSet集合</p>
+</li>
+<li><ul>
+<li>A:底层数据结构是哈希表(是一个元素为链表的数组)</li>
+</ul>
+</li>
+<li><p>TreeSet集合</p>
+</li>
+<li><ul>
+<li>A:底层数据结构是红黑树(是一个自平衡的二叉树)</li>
+<li>B:保证元素的排序方式</li>
+</ul>
+</li>
+<li><p>LinkedHashSet集合</p>
+</li>
+<li><ul>
+<li>A:：底层数据结构由哈希表和链表组成。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/%E9%9B%86%E5%90%88/" rel="tag"># 集合</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/11/Win10-VS2013-Opencv4-1-1/" rel="next" title="Win10+VS2013+Opencv4.1.1">
+                <i class="fa fa-chevron-left"></i> Win10+VS2013+Opencv4.1.1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/18/ArrayList%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" rel="prev" title="ArrayList源码解析">
+                ArrayList源码解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Peng</p>
+              <p class="site-description motion-element" itemprop="description">小小Android攻城狮</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#一、为啥需要集合？"><span class="nav-number">1.</span> <span class="nav-text">一、为啥需要集合？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二、数组和集合的区别"><span class="nav-number">2.</span> <span class="nav-text">二、数组和集合的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三、Collection的由来与功能"><span class="nav-number">3.</span> <span class="nav-text">三、Collection的由来与功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四、Collection的基础功能"><span class="nav-number">4.</span> <span class="nav-text">四、Collection的基础功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#五、Collection的Iterator"><span class="nav-number">5.</span> <span class="nav-text">五、Collection的Iterator</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#六、Collection主要集合类型：Set和List"><span class="nav-number">6.</span> <span class="nav-text">六、Collection主要集合类型：Set和List</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Peng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共8k字</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
