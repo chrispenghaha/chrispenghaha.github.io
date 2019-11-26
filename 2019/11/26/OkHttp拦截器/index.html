@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,okhttp," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本源码基于：OkHttp 3.10.0 1、拦截器的作用拦截器是OkHttp 执行网络请求中的重要角色，贯穿了整个请求执行的过程，能够监控，重写以及重试（请求的）调用  这是okhttp的请求执行过程，从应用发出request，到应用收到response，期间经历了N个拦截器。 2、拦截器的分类OkHttp的拦截器分为内部自带拦截器和自定义拦截器  如图： 内部自带拦截器由：（后面单独分析） 12">
+<meta name="keywords" content="java,okhttp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OkHttp拦截器">
+<meta property="og:url" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;index.html">
+<meta property="og:site_name" content="ChrisPeng Blog">
+<meta property="og:description" content="本源码基于：OkHttp 3.10.0 1、拦截器的作用拦截器是OkHttp 执行网络请求中的重要角色，贯穿了整个请求执行的过程，能够监控，重写以及重试（请求的）调用  这是okhttp的请求执行过程，从应用发出request，到应用收到response，期间经历了N个拦截器。 2、拦截器的分类OkHttp的拦截器分为内部自带拦截器和自定义拦截器  如图： 内部自带拦截器由：（后面单独分析） 12">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_01.png">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_02.png">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_03.png">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_04.png">
+<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_05.png">
+<meta property="og:updated_time" content="2019-11-26T12:00:47.977Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="/2019/11/26/OkHttp拦截器/"/>
+
+
+
+
+
+  <title>OkHttp拦截器 | ChrisPeng Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ChrisPeng Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">爱生活 爱编程</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="/2019/11/26/OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Peng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChrisPeng Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OkHttp拦截器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-26T19:46:33+08:00">
+                2019-11-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%BA%90%E7%A0%81/" itemprop="url" rel="index">
+                    <span itemprop="name">源码</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.6k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>本源码基于：OkHttp 3.10.0</strong></p>
+<h3 id="1、拦截器的作用"><a href="#1、拦截器的作用" class="headerlink" title="1、拦截器的作用"></a><strong>1、拦截器的作用</strong></h3><p><strong>拦截器</strong>是OkHttp 执行网络请求中的重要角色，贯穿了整个请求执行的过程，能够监控，重写以及重试（请求的）调用</p>
+<p><img src="img/OkHttp_intecptor_01.png" alt="img"></p>
+<p>这是okhttp的请求执行过程，从应用发出request，到应用收到response，期间经历了N个拦截器。</p>
+<h3 id="2、拦截器的分类"><a href="#2、拦截器的分类" class="headerlink" title="2、拦截器的分类"></a><strong>2、拦截器的分类</strong></h3><p>OkHttp的拦截器分为内部自带拦截器和自定义拦截器</p>
+<p><img src="img/OkHttp_intecptor_02.png" alt="img"></p>
+<p>如图：</p>
+<p>内部自带拦截器由：（后面单独分析）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1、RetryAndFollowUpInterceptor//重试和重定向拦截器</span><br><span class="line">2、BridgeInterceptor//桥接拦截器</span><br><span class="line">3、CacheInterceptor//缓存拦截器</span><br><span class="line">4、ConnectInterceptor//连接拦截器</span><br><span class="line">5、CallServerInterceptor//服务调用拦截器</span><br></pre></td></tr></table></figure>
+
+<p>自定义拦截器分为应用拦截器和网络拦截器：</p>
+<p>​        1）Application Interceptor(应用拦截器)</p>
+<ul>
+<li>不能操作中间的响应结果，比如重定向和重试，只能操作客户端主动的第一次请求以及最终的响应结果。</li>
+<li>始终调用一次，即使Http响应是从缓存中提供的。</li>
+<li>关注原始的request，而不关心注入的headers，比如If-None-Match。</li>
+<li>允许短路 short-circuit ，并且不调用 chain.proceed()。（注：这句话的意思是Chain.proceed()不需要一定要获取来自服务器的响应，但是必须还是需要返回Respond实例。那么实例从哪里来？答案是缓存。如果本地有缓存，可以从本地缓存中获取响应实例返回给客户端。这就是short-circuit (短路)的意思）</li>
+<li>允许请求失败重试，并多次调用 chain.proceed();</li>
+</ul>
+<p>　　 2）Network Interceptor（网络拦截器）</p>
+<ul>
+<li>能够对重定向和重试等中间响应进行操作</li>
+<li>不允许调用缓存来short-circuit (短路)这个请求。（注：意思就是说不能从缓存池中获取缓存对象返回给客户端，必须通过请求服务的方式获取响应，也就是Chain.proceed()）</li>
+<li>观察网络传输中数据传输和变化（注：比如当发生了重定向时，我们就能通过网络拦截器来确定存在重定向的情况）</li>
+<li>可以获取 Connection 携带的请求信息（即可以通过chain.connection() 获取非空对象）</li>
+</ul>
+<h5 id="应用拦截器和网络拦截器的异同："><a href="#应用拦截器和网络拦截器的异同：" class="headerlink" title="应用拦截器和网络拦截器的异同："></a>应用拦截器和网络拦截器的异同：</h5><h5 id="相同点："><a href="#相同点：" class="headerlink" title="相同点："></a>相同点：</h5><p>​    1、都能对server返回的response进行拦截</p>
+<p>​    2、两者都会被add到OkHttpClient内的一个ArrayList中。当请求执行的时候，多个拦截器会依次执行（list本身就是有序的）。</p>
+<p>​    3、都可以修改对应的请求或者是响应的数据。</p>
+<h5 id="不同点："><a href="#不同点：" class="headerlink" title="不同点："></a>不同点：</h5><p>​    1、okhttpClient添加两种拦截器的api不同。添加应用拦截器的接口是addInterceptor()，而添加网络拦截器的接口是addNetworkInterceptor().</p>
+<p>​    2、两者负责的区域不同，应用拦截器作用于okhttpCore到Application之间，网络拦截器作用于 network和okhttpCore之间</p>
+<p>​    3、Application Interceptor只会被调用一次，即使这个响应是从缓存中获取的；Network Interceptor对于从缓存获取的response则不会去触发NetworkInterceptor，因为响应会从CacheInterceptor返回。</p>
+<p>下面看一下拦截器接口：</p>
+<p><img src="img/OkHttp_intecptor_03.png" alt="img"></p>
+<p>其中需要特别说明的</p>
+<p><img src="img/OkHttp_intecptor_04.png" alt="img"></p>
+<p><strong>Application Interceptor</strong>调用返回的总是<strong>null</strong>，<strong>Network Interceptor</strong>返回<strong>正常的Connection对象</strong></p>
+<h3 id="3、拦截器的工作原理"><a href="#3、拦截器的工作原理" class="headerlink" title="3、拦截器的工作原理"></a><strong>3、拦截器的工作原理</strong></h3><p>在okhttp中拦截器是一个重要的概念，而拦截器中最重要的就是链的概念</p>
+<p>我们再回到getResponseWithInterceptorChain();</p>
+<p>1、首先创建集合来添加各种拦截器</p>
+<p>2、创建RealInterceptorChain拦截器链（这里链的概念在拦截器中运用的很深刻）并执行它的proceed方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">proceed</span><span class="params">(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec,</span></span></span><br><span class="line"><span class="function"><span class="params">    RealConnection connection)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (index &gt;= interceptors.size()) <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError();</span><br><span class="line"></span><br><span class="line">  calls++;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// If we already have a stream, confirm that the incoming request will use it.</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.httpCodec != <span class="keyword">null</span> &amp;&amp; !<span class="keyword">this</span>.connection.supportsUrl(request.url())) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"network interceptor "</span> + interceptors.get(index - <span class="number">1</span>)</span><br><span class="line">        + <span class="string">" must retain the same host and port"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// If we already have a stream, confirm that this is the only call to chain.proceed().</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.httpCodec != <span class="keyword">null</span> &amp;&amp; calls &gt; <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"network interceptor "</span> + interceptors.get(index - <span class="number">1</span>)</span><br><span class="line">        + <span class="string">" must call proceed() exactly once"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Call the next interceptor in the chain.</span></span><br><span class="line">  RealInterceptorChain next = <span class="keyword">new</span> RealInterceptorChain(interceptors, streamAllocation, httpCodec,</span><br><span class="line">      connection, index + <span class="number">1</span>, request, call, eventListener, connectTimeout, readTimeout,</span><br><span class="line">      writeTimeout);</span><br><span class="line">  Interceptor interceptor = interceptors.get(index);</span><br><span class="line">  Response response = interceptor.intercept(next);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Confirm that the next interceptor made its required call to chain.proceed().</span></span><br><span class="line">  <span class="keyword">if</span> (httpCodec != <span class="keyword">null</span> &amp;&amp; index + <span class="number">1</span> &lt; interceptors.size() &amp;&amp; next.calls != <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"network interceptor "</span> + interceptor</span><br><span class="line">        + <span class="string">" must call proceed() exactly once"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Confirm that the intercepted response isn't null.</span></span><br><span class="line">  <span class="keyword">if</span> (response == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"interceptor "</span> + interceptor + <span class="string">" returned null"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (response.body() == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">        <span class="string">"interceptor "</span> + interceptor + <span class="string">" returned a response with no body"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> response;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在proceed中代码较多最主要的将它提出来：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (index &gt;= interceptors.size()) <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError();</span><br><span class="line">  <span class="comment">// 先定好下一个链条</span></span><br><span class="line">RealInterceptorChain next = <span class="keyword">new</span> RealInterceptorChain(</span><br><span class="line">    interceptors, streamAllocation, httpCodec, connection, index + <span class="number">1</span>, request);</span><br><span class="line">Interceptor interceptor = interceptors.get(index);<span class="comment">//获取到当前的拦截器</span></span><br><span class="line">Response response = interceptor.intercept(next);<span class="comment">//用当前拦截器对链条中的请求进行处理</span></span><br><span class="line"><span class="comment">// Confirm that the intercepted response isn't null.</span></span><br><span class="line"><span class="keyword">if</span> (response == <span class="keyword">null</span>) &#123;</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"interceptor "</span> + interceptor + <span class="string">" returned null"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> response;</span><br></pre></td></tr></table></figure>
+
+<p>创建RealInterceptorChain并且下标为index+1,index是上一个RealInterceptorChain通过构造器传递下来的</p>
+<p>通过下标获取到inercepter调用intercept(next)方法获取到Response并返回。看看 interceptor.intercept(next)接口，实际上就是在此调用它的实现类并通过intercept(Chain chain）得到的Response并返回上一级；</p>
+<p>这样一级一级的调用什么时候算完了呢？其实在上面的代码中，第一段if (index &gt;= interceptors.size()) throw new AssertionError()就判断了，当下标大于拦截器数量时就抛出异常停止下一级调用了。</p>
+<p>就这样拦截器<strong>实现了链式调用，使我们一直往下调用拦截器链并通过当前拦截器interceptor.intercept(next)获得response返回给上一个拦截器。这样我们就把所有拦截器都执行完毕，这也是okhttp拦截器的核心逻辑，也是我们如何一步一步获取到接口的返回</strong></p>
+<p><strong>时序图如下：</strong></p>
+<p><img src="img/OkHttp_intecptor_05.png" alt="img"></p>
+<p><strong>总结</strong></p>
+<ul>
+<li>先创建拦截器集合</li>
+<li>将集合放拦截器链中执行它的processd()方法</li>
+<li>在processd()中执行拦截器的通过下标获得此次intercetpor</li>
+<li>调用intercepter(Chain chain)方法返回Response并再次执行下一级拦截器链的processd()方法形成链式调用，最终获得一个完整的返回</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/okhttp/" rel="tag"># okhttp</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/18/LinkedList%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" rel="next" title="LinkedList源码解析">
+                <i class="fa fa-chevron-left"></i> LinkedList源码解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/26/BridgeInterceptor%E6%A1%A5%E6%8E%A5%E6%8B%A6%E6%88%AA%E5%99%A8/" rel="prev" title="BridgeInterceptor桥接拦截器">
+                BridgeInterceptor桥接拦截器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Peng</p>
+              <p class="site-description motion-element" itemprop="description">小小Android攻城狮</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、拦截器的作用"><span class="nav-number">1.</span> <span class="nav-text">1、拦截器的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、拦截器的分类"><span class="nav-number">2.</span> <span class="nav-text">2、拦截器的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#应用拦截器和网络拦截器的异同："><span class="nav-number">2.0.1.</span> <span class="nav-text">应用拦截器和网络拦截器的异同：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#相同点："><span class="nav-number">2.0.2.</span> <span class="nav-text">相同点：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#不同点："><span class="nav-number">2.0.3.</span> <span class="nav-text">不同点：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、拦截器的工作原理"><span class="nav-number">3.</span> <span class="nav-text">3、拦截器的工作原理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Peng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共13.3k字</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
