@@ -87,14 +87,14 @@
 <meta property="og:site_name" content="ChrisPeng Blog">
 <meta property="og:description" content="本源码基于：OkHttp 3.10.0 1、拦截器的作用拦截器是OkHttp 执行网络请求中的重要角色，贯穿了整个请求执行的过程，能够监控，重写以及重试（请求的）调用  这是okhttp的请求执行过程，从应用发出request，到应用收到response，期间经历了N个拦截器。 2、拦截器的分类OkHttp的拦截器分为内部自带拦截器和自定义拦截器">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_01.png">
-<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_02.png">
-<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_03.png">
-<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_04.png">
-<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_05.png">
-<meta property="og:updated_time" content="2019-11-26T12:48:39.308Z">
+<meta property="og:image" content="&#x2F;img&#x2F;OkHttp_intecptor_01.png">
+<meta property="og:image" content="&#x2F;img&#x2F;OkHttp_intecptor_02.png">
+<meta property="og:image" content="&#x2F;img&#x2F;OkHttp_intecptor_03.png">
+<meta property="og:image" content="&#x2F;img&#x2F;OkHttp_intecptor_04.png">
+<meta property="og:image" content="&#x2F;img&#x2F;OkHttp_intecptor_05.png">
+<meta property="og:updated_time" content="2019-11-26T13:23:07.758Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;OkHttp_intecptor_01.png">
+<meta name="twitter:image" content="&#x2F;img&#x2F;OkHttp_intecptor_01.png">
 
 
 
@@ -384,10 +384,10 @@
       
         <p><strong>本源码基于：OkHttp 3.10.0</strong></p>
 <h3 id="1、拦截器的作用"><a href="#1、拦截器的作用" class="headerlink" title="1、拦截器的作用"></a><strong>1、拦截器的作用</strong></h3><p><strong>拦截器</strong>是OkHttp 执行网络请求中的重要角色，贯穿了整个请求执行的过程，能够监控，重写以及重试（请求的）调用</p>
-<p><img src="img/OkHttp_intecptor_01.png" alt="img"></p>
+<p><img src="/img/OkHttp_intecptor_01.png" alt="img"></p>
 <p>这是okhttp的请求执行过程，从应用发出request，到应用收到response，期间经历了N个拦截器。</p>
 <h3 id="2、拦截器的分类"><a href="#2、拦截器的分类" class="headerlink" title="2、拦截器的分类"></a><strong>2、拦截器的分类</strong></h3><p>OkHttp的拦截器分为内部自带拦截器和自定义拦截器</p>
-<p><img src="img/OkHttp_intecptor_02.png" alt="img"></p>
+<p><img src="/img/OkHttp_intecptor_02.png" alt="img"></p>
 <a id="more"></a>
 
 <p>如图：</p>
@@ -417,9 +417,9 @@
 <p>​    2、两者负责的区域不同，应用拦截器作用于okhttpCore到Application之间，网络拦截器作用于 network和okhttpCore之间</p>
 <p>​    3、Application Interceptor只会被调用一次，即使这个响应是从缓存中获取的；Network Interceptor对于从缓存获取的response则不会去触发NetworkInterceptor，因为响应会从CacheInterceptor返回。</p>
 <p>下面看一下拦截器接口：</p>
-<p><img src="img/OkHttp_intecptor_03.png" alt="img"></p>
+<p><img src="/img/OkHttp_intecptor_03.png" alt="img"></p>
 <p>其中需要特别说明的</p>
-<p><img src="img/OkHttp_intecptor_04.png" alt="img"></p>
+<p><img src="/img/OkHttp_intecptor_04.png" alt="img"></p>
 <p><strong>Application Interceptor</strong>调用返回的总是<strong>null</strong>，<strong>Network Interceptor</strong>返回<strong>正常的Connection对象</strong></p>
 <h3 id="3、拦截器的工作原理"><a href="#3、拦截器的工作原理" class="headerlink" title="3、拦截器的工作原理"></a><strong>3、拦截器的工作原理</strong></h3><p>在okhttp中拦截器是一个重要的概念，而拦截器中最重要的就是链的概念</p>
 <p>我们再回到getResponseWithInterceptorChain();</p>
@@ -435,7 +435,7 @@
 <p>这样一级一级的调用什么时候算完了呢？其实在上面的代码中，第一段if (index &gt;= interceptors.size()) throw new AssertionError()就判断了，当下标大于拦截器数量时就抛出异常停止下一级调用了。</p>
 <p>就这样拦截器<strong>实现了链式调用，使我们一直往下调用拦截器链并通过当前拦截器interceptor.intercept(next)获得response返回给上一个拦截器。这样我们就把所有拦截器都执行完毕，这也是okhttp拦截器的核心逻辑，也是我们如何一步一步获取到接口的返回</strong></p>
 <p><strong>时序图如下：</strong></p>
-<p><img src="img/OkHttp_intecptor_05.png" alt="img"></p>
+<p><img src="/img/OkHttp_intecptor_05.png" alt="img"></p>
 <p><strong>总结</strong></p>
 <ul>
 <li>先创建拦截器集合</li>

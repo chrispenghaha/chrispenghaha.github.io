@@ -558,7 +558,7 @@
 <p>这个可能是这5个当中最简单的一个拦截器了，它从上一层RetryAndFollowUpInterceptor拿到request之后，只做了一件事:<strong>补全请求头</strong></p>
 <p>我们使用OkHttp发送网络请求，一般只会 addHeader中写上我们业务相关的一些参数，而真正的请求头远远没有那么简单。</p>
 <p>服务器不只是要识别业务参数，还要识别请求类型，请求体的解析方式等，具体列举如下：</p>
-<p><img src="img/BridgeInterceptor_01.png" alt="img"></p>
+<p><img src="/img/BridgeInterceptor_01.png" alt="img"></p>
 <p>它在补全了请求头之后，交给下一个拦截器处理。</p>
           <!--noindex-->
           <div class="post-button text-center">
@@ -738,10 +738,10 @@
         
           <p><strong>本源码基于：OkHttp 3.10.0</strong></p>
 <h3 id="1、拦截器的作用"><a href="#1、拦截器的作用" class="headerlink" title="1、拦截器的作用"></a><strong>1、拦截器的作用</strong></h3><p><strong>拦截器</strong>是OkHttp 执行网络请求中的重要角色，贯穿了整个请求执行的过程，能够监控，重写以及重试（请求的）调用</p>
-<p><img src="img/OkHttp_intecptor_01.png" alt="img"></p>
+<p><img src="/img/OkHttp_intecptor_01.png" alt="img"></p>
 <p>这是okhttp的请求执行过程，从应用发出request，到应用收到response，期间经历了N个拦截器。</p>
 <h3 id="2、拦截器的分类"><a href="#2、拦截器的分类" class="headerlink" title="2、拦截器的分类"></a><strong>2、拦截器的分类</strong></h3><p>OkHttp的拦截器分为内部自带拦截器和自定义拦截器</p>
-<p><img src="img/OkHttp_intecptor_02.png" alt="img"></p>
+<p><img src="/img/OkHttp_intecptor_02.png" alt="img"></p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/11/26/OkHttp%E6%8B%A6%E6%88%AA%E5%99%A8/#more" rel="contents">
@@ -1505,7 +1505,7 @@
         
           <h1 id="VS2013安装OpenCV4-1-1版本"><a href="#VS2013安装OpenCV4-1-1版本" class="headerlink" title="VS2013安装OpenCV4.1.1版本"></a>VS2013安装OpenCV4.1.1版本</h1><h5 id="1、下载并安装OpenCV"><a href="#1、下载并安装OpenCV" class="headerlink" title="1、下载并安装OpenCV"></a>1、下载并安装OpenCV</h5><p>  打开OpenCV的官网 <a href="https://opencv.org/releases.html">https://opencv.org/releases.html</a> 打开链接选择对一个的版本进行下载我下的是最新的版本4.1.1的大小215M(Windows版本)</p>
 <h5 id="2、解压缩OpenCV"><a href="#2、解压缩OpenCV" class="headerlink" title="2、解压缩OpenCV"></a>2、解压缩OpenCV</h5><p>右键解压缩opencv-4.1.1-vc14_vc15.exe</p>
-<p><img src="img/image-20191111232549026.png" alt="image-20191111232549026"></p>
+<p><img src="/img/image-20191111232549026.png" alt="image-20191111232549026"></p>
 <h5 id="3配置环境变量"><a href="#3配置环境变量" class="headerlink" title="3配置环境变量"></a>3配置环境变量</h5><p>将E:\BaiduNetdiskDownload\opencv\build\x64\vc14\bin</p>
 <p>E:\BaiduNetdiskDownload\opencv\build\x64\vc15\bin</p>
 <p>加入到环境变量中</p>

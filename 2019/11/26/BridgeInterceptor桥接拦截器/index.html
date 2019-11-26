@@ -87,10 +87,10 @@
 <meta property="og:site_name" content="ChrisPeng Blog">
 <meta property="og:description" content="本源码基于：OkHttp 3.10.0 这个可能是这5个当中最简单的一个拦截器了，它从上一层RetryAndFollowUpInterceptor拿到request之后，只做了一件事:补全请求头 我们使用OkHttp发送网络请求，一般只会 addHeader中写上我们业务相关的一些参数，而真正的请求头远远没有那么简单。 服务器不只是要识别业务参数，还要识别请求类型，请求体的解析方式等，具体列举如下">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;BridgeInterceptor%E6%A1%A5%E6%8E%A5%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;BridgeInterceptor_01.png">
-<meta property="og:updated_time" content="2019-11-26T12:48:01.228Z">
+<meta property="og:image" content="&#x2F;img&#x2F;BridgeInterceptor_01.png">
+<meta property="og:updated_time" content="2019-11-26T13:21:49.266Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;2019&#x2F;11&#x2F;26&#x2F;BridgeInterceptor%E6%A1%A5%E6%8E%A5%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;img&#x2F;BridgeInterceptor_01.png">
+<meta name="twitter:image" content="&#x2F;img&#x2F;BridgeInterceptor_01.png">
 
 
 
@@ -382,7 +382,7 @@
 <p>这个可能是这5个当中最简单的一个拦截器了，它从上一层RetryAndFollowUpInterceptor拿到request之后，只做了一件事:<strong>补全请求头</strong></p>
 <p>我们使用OkHttp发送网络请求，一般只会 addHeader中写上我们业务相关的一些参数，而真正的请求头远远没有那么简单。</p>
 <p>服务器不只是要识别业务参数，还要识别请求类型，请求体的解析方式等，具体列举如下：</p>
-<p><img src="img/BridgeInterceptor_01.png" alt="img"></p>
+<p><img src="/img/BridgeInterceptor_01.png" alt="img"></p>
 <p>它在补全了请求头之后，交给下一个拦截器处理。</p>
 <a id="more"></a>
 
