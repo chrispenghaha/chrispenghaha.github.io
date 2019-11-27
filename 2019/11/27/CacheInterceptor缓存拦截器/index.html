@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,okhttp," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本源码基于：OkHttp 3.10.0 作为拦截器链中的第三个拦截器，缓存拦截器最重要的责任就是对网络请求的缓存，正如浏览器在访问网络请求的时候提供缓存功能一样，Okhttp也提供了缓存功能,使用Okhttp的缓存其实跟浏览器的缓存有相似之处。 缓存的优势 缓存的使用场景很多，通过它可以将数据通过一定的规则存储起来，再次请求数据的时候就可以快速从缓存中读取了，缓存有以下优势。  减少向服务器请求的">
+<meta name="keywords" content="java,okhttp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CacheInterceptor缓存拦截器">
+<meta property="og:url" content="&#x2F;2019&#x2F;11&#x2F;27&#x2F;CacheInterceptor%E7%BC%93%E5%AD%98%E6%8B%A6%E6%88%AA%E5%99%A8&#x2F;index.html">
+<meta property="og:site_name" content="ChrisPeng Blog">
+<meta property="og:description" content="本源码基于：OkHttp 3.10.0 作为拦截器链中的第三个拦截器，缓存拦截器最重要的责任就是对网络请求的缓存，正如浏览器在访问网络请求的时候提供缓存功能一样，Okhttp也提供了缓存功能,使用Okhttp的缓存其实跟浏览器的缓存有相似之处。 缓存的优势 缓存的使用场景很多，通过它可以将数据通过一定的规则存储起来，再次请求数据的时候就可以快速从缓存中读取了，缓存有以下优势。  减少向服务器请求的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-27T12:34:23.973Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="/2019/11/27/CacheInterceptor缓存拦截器/"/>
+
+
+
+
+
+  <title>CacheInterceptor缓存拦截器 | ChrisPeng Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ChrisPeng Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">爱生活 爱编程</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="/2019/11/27/CacheInterceptor%E7%BC%93%E5%AD%98%E6%8B%A6%E6%88%AA%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Peng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChrisPeng Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CacheInterceptor缓存拦截器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-27T20:19:34+08:00">
+                2019-11-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%BA%90%E7%A0%81/" itemprop="url" rel="index">
+                    <span itemprop="name">源码</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.2k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>本源码基于：OkHttp 3.10.0</strong></p>
+<p>作为拦截器链中的第三个拦截器，缓存拦截器最重要的责任就是对网络请求的缓存，正如浏览器在访问网络请求的时候提供缓存功能一样，Okhttp也提供了缓存功能,使用Okhttp的缓存其实跟浏览器的缓存有相似之处。</p>
+<p><strong>缓存的优势</strong></p>
+<p>缓存的使用场景很多，通过它可以将数据通过一定的规则存储起来，再次请求数据的时候就可以快速从缓存中读取了，缓存有以下优势。</p>
+<ol>
+<li>减少向服务器请求的次数，减轻服务器的负载。</li>
+<li>加快了本地的响应速度，直接从缓存中取数据比从网络读取要快很多。</li>
+<li>提供无网模式下的浏览体验，没有网络的情况下也能显示内容。</li>
+</ol>
+<h3 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a><strong>构造方法</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> InternalCache cache;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">CacheInterceptor</span><span class="params">(InternalCache cache)</span> </span>&#123;  </span><br><span class="line">	<span class="keyword">this</span>.cache = cache; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它的实例化是在RealCall当中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">interceptors.add(<span class="keyword">new</span> CacheInterceptor(client.internalCache()));</span><br></pre></td></tr></table></figure>
+
+<p>从这里可以看到参数是需要我们在构建OKHttpClient的时候传入的，如果没有传，那OKHttp是默认不会使用缓存的</p>
+<p>InternalCache它是一个接口，但是OKHttp不推荐开发者自定义该接口的实现类，而应该使用OKHttp提供的实现类Cache</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">httpClient = <span class="keyword">new</span> OkHttpClient</span><br><span class="line">                .Builder()</span><br><span class="line">                .cache(<span class="keyword">new</span> Cache(<span class="keyword">new</span> File(<span class="string">"cache"</span>),<span class="number">1024</span>*<span class="number">1024</span>*<span class="number">24</span>))</span><br><span class="line">                .build();</span><br></pre></td></tr></table></figure>
+
+<p>Cache类接收两个参数，第一个参数是缓存目录，第二个参数是最大缓存值</p>
+<p>接着看它的拦截方法</p>
+<a id="more"></a>
+
+<h3 id="intercept"><a href="#intercept" class="headerlink" title="intercept"></a><strong>intercept</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> </span><br><span class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  <span class="comment">// 通过request从缓存中获取响应</span></span><br><span class="line">  Response cacheCandidate = cache != <span class="keyword">null</span></span><br><span class="line">      ? cache.get(chain.request())</span><br><span class="line">      : <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">long</span> now = System.currentTimeMillis();</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * CacheStrategy 是一个缓存策略类 比如强制缓存 对比缓存等 它决定是使用缓存还是进行网络请求</span></span><br><span class="line"><span class="comment">  * 其内部维护了Request、Response</span></span><br><span class="line"><span class="comment">  * 如果Request为null表示不使用网络</span></span><br><span class="line"><span class="comment">  * 如果Response为null表示不使用缓存</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">  CacheStrategy strategy = <span class="keyword">new</span> CacheStrategy.Factory(now, chain.request(), cacheCandidate).get();</span><br><span class="line">  Request networkRequest = strategy.networkRequest;</span><br><span class="line">  Response cacheResponse = strategy.cacheResponse;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//根据缓存策略，更新统计指标：请求次数、使用网络请求次数、使用缓存次数</span></span><br><span class="line">  <span class="keyword">if</span> (cache != <span class="keyword">null</span>) &#123;</span><br><span class="line">    cache.trackResponse(strategy);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 能从缓存中获取响应但是缓存策略是不使用缓存，那就关闭获取的缓存</span></span><br><span class="line">  <span class="keyword">if</span> (cacheCandidate != <span class="keyword">null</span> &amp;&amp; cacheResponse == <span class="keyword">null</span>) &#123;</span><br><span class="line">    closeQuietly(cacheCandidate.body()); <span class="comment">// The cache candidate wasn't applicable. Close it.</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果缓存策略是不使用网络也不使用缓存，那就构建一个504错误码的响应并返回</span></span><br><span class="line">  <span class="keyword">if</span> (networkRequest == <span class="keyword">null</span> &amp;&amp; cacheResponse == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Response.Builder()</span><br><span class="line">        .request(chain.request())</span><br><span class="line">        .protocol(Protocol.HTTP_1_1)</span><br><span class="line">        .code(<span class="number">504</span>)</span><br><span class="line">        .message(<span class="string">"Unsatisfiable Request (only-if-cached)"</span>)</span><br><span class="line">        .body(Util.EMPTY_RESPONSE)</span><br><span class="line">        .sentRequestAtMillis(-<span class="number">1L</span>)</span><br><span class="line">        .receivedResponseAtMillis(System.currentTimeMillis())</span><br><span class="line">        .build();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果缓存策略是不使用网络但是可以使用缓存，那就通过缓存策略的缓存构建响应并返回</span></span><br><span class="line">  <span class="keyword">if</span> (networkRequest == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> cacheResponse.newBuilder()</span><br><span class="line">        .cacheResponse(stripBody(cacheResponse))</span><br><span class="line">        .build();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 定义响应</span></span><br><span class="line">  Response networkResponse = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">   <span class="comment">// 到这里就说明可以使用网络，那就交给下一个拦截器去处理获取响应</span></span><br><span class="line">    networkResponse = chain.proceed(networkRequest);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">// 如果发生了IO异常或者其它异常，关闭缓存避免内存泄漏</span></span><br><span class="line">    <span class="keyword">if</span> (networkResponse == <span class="keyword">null</span> &amp;&amp; cacheCandidate != <span class="keyword">null</span>) &#123;</span><br><span class="line">      closeQuietly(cacheCandidate.body());</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果缓存策略是可以使用缓存</span></span><br><span class="line">  <span class="keyword">if</span> (cacheResponse != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 且网络响应码是304 HTTP_NOT_MODIFIED说明本地缓存可以使用</span></span><br><span class="line">    <span class="comment">// 且网络响应是没有响应体的</span></span><br><span class="line">    <span class="comment">// 这时候就合并缓存响应和网络响应并构建新的响应</span></span><br><span class="line">    <span class="keyword">if</span> (networkResponse.code() == HTTP_NOT_MODIFIED) &#123;</span><br><span class="line">      Response response = cacheResponse.newBuilder()</span><br><span class="line">          .headers(combine(cacheResponse.headers(), networkResponse.headers()))</span><br><span class="line">          .sentRequestAtMillis(networkResponse.sentRequestAtMillis())</span><br><span class="line">          .receivedResponseAtMillis(networkResponse.receivedResponseAtMillis())</span><br><span class="line">          .cacheResponse(stripBody(cacheResponse))</span><br><span class="line">          .networkResponse(stripBody(networkResponse))</span><br><span class="line">          .build();</span><br><span class="line">      networkResponse.body().close();</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 在合并标头之后但在剥离Content-Encoding标头之前更新缓存</span></span><br><span class="line">      cache.trackConditionalCacheHit();</span><br><span class="line">      cache.update(cacheResponse, response);</span><br><span class="line">      <span class="keyword">return</span> response;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      closeQuietly(cacheResponse.body());</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 走到这里说明缓存策略是不可以使用缓存或本地缓存不可用</span></span><br><span class="line">  <span class="comment">// 那就通过网络响应构建响应对象</span></span><br><span class="line">  Response response = networkResponse.newBuilder()</span><br><span class="line">      .cacheResponse(stripBody(cacheResponse))</span><br><span class="line">      .networkResponse(stripBody(networkResponse))</span><br><span class="line">      .build();</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 客户端允许使用缓存</span></span><br><span class="line">  <span class="keyword">if</span> (cache != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 如果响应有响应体且响应可以缓存 那就将响应写入到缓存</span></span><br><span class="line">    <span class="keyword">if</span> (HttpHeaders.hasBody(response) &amp;&amp; CacheStrategy.isCacheable(response, networkRequest)) &#123;</span><br><span class="line">      <span class="comment">// 缓存响应的部分信息</span></span><br><span class="line">      CacheRequest cacheRequest = cache.put(response);</span><br><span class="line">      <span class="comment">// 缓存响应体并返回响应</span></span><br><span class="line">      <span class="keyword">return</span> cacheWritingResponse(cacheRequest, response);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过请求方法判断需不需要进行缓存</span></span><br><span class="line">    <span class="keyword">if</span> (HttpMethod.invalidatesCache(networkRequest.method())) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 不合法就删除缓存</span></span><br><span class="line">        cache.remove(networkRequest);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (IOException ignored) &#123;</span><br><span class="line">        <span class="comment">// The cache cannot be written.</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> response;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到想要缓存一个正确的网络响应，需要满足三个条件</p>
+<ul>
+<li>客户端允许缓存，即设置了Cache</li>
+<li>响应有响应体</li>
+<li>响应是符合缓存条件的</li>
+</ul>
+<p>第一个条件通过OkHttpClient.cache设置；第二个条件是通过hasBody方法判断的</p>
+<p><strong>HttpHeaders.hasBody</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 判断网络响应是否有响应体</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasBody</span><span class="params">(Response response)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 如果请求方法是HEAD，直接return</span></span><br><span class="line">  <span class="comment">// 该方法只有响应头，没有响应体</span></span><br><span class="line">  <span class="keyword">if</span> (response.request().method().equals(<span class="string">"HEAD"</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> responseCode = response.code();</span><br><span class="line">  <span class="comment">//根据响应码判断，如果符合条件就返回true，认为有响应体</span></span><br><span class="line">  <span class="keyword">if</span> ((responseCode &lt; HTTP_CONTINUE || responseCode &gt;= <span class="number">200</span>)</span><br><span class="line">      &amp;&amp; responseCode != HTTP_NO_CONTENT</span><br><span class="line">      &amp;&amp; responseCode != HTTP_NOT_MODIFIED) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果不符合上述响应码，我们还是要看下Content-Length和Transfer-Encoding响应头的情况来决定是否缓存</span></span><br><span class="line">  <span class="comment">// Content-Length:这是表示响应体的长度,contentLength(response)也就是获取该字段的值，如果大于0那就肯定有响应体</span></span><br><span class="line">  <span class="comment">// Transfer-Encoding:分块传输 就是将响应体分成多个块进行传输，这个也就代表着肯定有响应体</span></span><br><span class="line">  <span class="keyword">if</span> (contentLength(response) != -<span class="number">1</span></span><br><span class="line">      || <span class="string">"chunked"</span>.equalsIgnoreCase(response.header(<span class="string">"Transfer-Encoding"</span>))) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>响应码</strong></p>
+<p>1XX: 100-199 的状态码代表着信息性状态码，比如上面的HTTP_CONTINUE（100）</p>
+<p>2xx: 200-299 的状态码代表着成功状态码,但是204状态码代表着没有实体仅仅有响应行和响应头，HTTP_NO_CONTENT即是204</p>
+<p>3xx: 300-399 的状态码代表着重定向 但是304状态码代表着请求资源未修改,请使用缓存,只有响应行和响应头没有响应体，即HTTP_NOT_MODIFIED</p>
+<p>4xx: 400-499 的状态码代表着客户端错误代码</p>
+<p>5xx: 500-599 的状态码代表着服务器错误代码</p>
+<p>上面的通过响应码的判断逻辑也就是当状态码小于100的时候，那肯定也就小于204和304，是有响应体的</p>
+<p>当状态码大于等于200的时候，同时不等于204和304，也说明有响应体，需要进行缓存网络响应</p>
+<p>这里讲下304这个响应码，即HTTP_NOT_MODIFIED对应的值：</p>
+<p>当客户端第一次访问服务器，服务器在返回资源的同时会将一个ETag值保存在响应头，ETag值表示当前请求的资源在服务器的唯一标识，生成规则由服务器决定；客户端接收到后会缓存响应中的数据和ETag值</p>
+<p>当客户端发现该资源过期时，如果它还有ETag声明，那再次向服务器请求时会带上If-None-Match请求头，值就是ETag的值</p>
+<p>服务器接收到请求后，发现请求头有If-None-Match值，那就跟该资源的ETag值进行比较，根据结果返回200或者304</p>
+<p><a href="https://www.iteye.com/blog/desert3-1136548">具体响应码</a></p>
+<p><strong>CacheStrategy.isCacheable</strong></p>
+<p>第三个条件就是判断响应是否符合缓存条件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isCacheable</span><span class="params">(Response response, Request request)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Always go to network for uncacheable response codes (RFC 7231 section 6.1),</span></span><br><span class="line">  <span class="comment">// This implementation doesn't support caching partial content.</span></span><br><span class="line">  <span class="keyword">switch</span> (response.code()) &#123;</span><br><span class="line">    <span class="comment">//200 成功返回状态码</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_OK:</span><br><span class="line">    <span class="comment">//203 实体头部包含的信息来自于资源源服务器的副本而不是来自于源服务器</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_NOT_AUTHORITATIVE:</span><br><span class="line">    <span class="comment">//204 只有头部没有实体,在根据响应码判断是否有响应体那时已经排除了204 和304的状态码</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_NO_CONTENT:</span><br><span class="line">    <span class="keyword">case</span> HTTP_MULT_CHOICE:</span><br><span class="line">    <span class="keyword">case</span> HTTP_MOVED_PERM:</span><br><span class="line">    <span class="comment">//404 找不到资源</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_NOT_FOUND:</span><br><span class="line">    <span class="comment">//405 请求方法不支持</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_BAD_METHOD:</span><br><span class="line">    <span class="comment">//410 和404类似 只是服务器以前拥有该资源但是删除了</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_GONE:</span><br><span class="line">    <span class="comment">//414 客户端发出的url长度太长</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_REQ_TOO_LONG:</span><br><span class="line">    <span class="comment">//501 服务器发生一个错误 无法提供服务</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_NOT_IMPLEMENTED:</span><br><span class="line">    <span class="keyword">case</span> StatusLine.HTTP_PERM_REDIRECT:</span><br><span class="line">      <span class="comment">// These codes can be cached unless headers forbid it.</span></span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="comment">//302 请求的url已被移除</span></span><br><span class="line">    <span class="keyword">case</span> HTTP_MOVED_TEMP:</span><br><span class="line">    <span class="comment">//307 和302类似</span></span><br><span class="line">    <span class="keyword">case</span> StatusLine.HTTP_TEMP_REDIRECT:</span><br><span class="line">      <span class="comment">// 当拥有正确的头部时，这些状态码都表示可缓存</span></span><br><span class="line">      <span class="keyword">if</span> (response.header(<span class="string">"Expires"</span>) != <span class="keyword">null</span></span><br><span class="line">          || response.cacheControl().maxAgeSeconds() != -<span class="number">1</span></span><br><span class="line">          || response.cacheControl().isPublic()</span><br><span class="line">          || response.cacheControl().isPrivate()) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">      <span class="comment">// 其它状态吗都不给予缓存</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// A 'no-store' directive on request or response prevents the response from being cached.</span></span><br><span class="line">  <span class="keyword">return</span> !response.cacheControl().noStore() &amp;&amp; !request.cacheControl().noStore();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>HttpMethod.invalidatesCache</strong></p>
+<p>最后再看下对请求方法的判断</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">invalidatesCache</span><span class="params">(String method)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> method.equals(<span class="string">"POST"</span>)</span><br><span class="line">	    || method.equals(<span class="string">"PATCH"</span>)</span><br><span class="line">	    || method.equals(<span class="string">"PUT"</span>)</span><br><span class="line">	    || method.equals(<span class="string">"DELETE"</span>)</span><br><span class="line">	    || method.equals(<span class="string">"MOVE"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到我们的网络请求方法是POST，PATCH，PUT，DELETE，MOVE这些方法的时候，会将对应的缓存删除</p>
+<p>同时在hasBody方法中还屏蔽了HEAD方法，所以这里会产生一条结论就是<strong>OKHttp支持缓存的网络请求方法只有get方法了</strong></p>
+<p><a href="https://blog.csdn.net/qq_30993595/article/details/87886518">参考资料</a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h3><p>从上面的方法总结下缓存拦截器的工作逻辑</p>
+<ul>
+<li><p>通过request从缓存中获取响应</p>
+</li>
+<li><p>创建缓存策略，从缓存策略类中获取Request和Response</p>
+</li>
+<li><p>如果Request和Response都为null，说明网络不可用且缓存也不可用，那就构建504响应返回</p>
+</li>
+<li><p>如果Request为null，说明网络不可用，但是可以使用缓存，那就通过缓存策略获取到的缓存构建响应返回</p>
+</li>
+<li><p>如果网络可以使用，那就通过下一个拦截器获取响应</p>
+</li>
+<li><p>如果缓存策略获取到的缓存可以用，同时网络请求获取到的响应码是304，说明服务器没有修改数据，本地缓存是可以用的，那就通过这两个响应构建新的响应并返回</p>
+</li>
+<li><p>走到这里说明缓存策略中的缓存不能使用，即服务器修改了数据，那就通过网络响应构建新的响应</p>
+</li>
+<li><p>如果客户端允许缓存，且响应有响应体，同时响应可以缓存 那就将响应写入到缓存</p>
+</li>
+<li><p>再通过请求方法判断是否需要缓存，不需要的话就删除</p>
+</li>
+<li><p>将最新数据返回给上一个拦截器</p>
+</li>
+</ul>
+<p>总体看下来缓存拦截器并不难理解，但是其中涉及到两个非常重要的类</p>
+<ul>
+<li>Cache：OKHttp中缓存具体的操作类</li>
+<li>CacheStrategy：缓存策略类，由它决定是使用缓存还是使用网络请求</li>
+</ul>
+<h3 id="思考："><a href="#思考：" class="headerlink" title="思考："></a><strong>思考：</strong></h3><p>​       1、如服务器返回的响应头不支持缓存，但是我们客户端想要缓存，怎么办？</p>
+<p>​       2、无网络状态下，我们想要访问缓存，该如何操作？</p>
+<p>关于第一点，还记得网络拦截器吗？网络拦截器作用于 network和okhttpCore之间</p>
+<p>​      我们可以利用网络拦截器篡改服务器响应头（注意：一般情况下，客户端不应该修改响应头，客户端使用什么样的缓存策略，应该由服务器确定，大家根据具体情况酌情使用）</p>
+<p>具体例子：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> interceptor: Interceptor = <span class="keyword">object</span> : Interceptor &#123;</span><br><span class="line">    <span class="meta">@Throws(IOException::class)</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">intercept</span><span class="params">(chain: <span class="type">Interceptor</span>.<span class="type">Chain</span>)</span></span>: Response? &#123;</span><br><span class="line">        <span class="keyword">var</span> request = chain.request()</span><br><span class="line">        <span class="keyword">if</span> (checkNet(<span class="keyword">this</span><span class="symbol">@MainActivity</span>)) &#123;<span class="comment">//有网时</span></span><br><span class="line">        <span class="keyword">val</span> response = chain.proceed(request)</span><br><span class="line">        <span class="keyword">val</span> cacheControl = request.cacheControl().toString()</span><br><span class="line">        <span class="keyword">return</span> response.newBuilder()</span><br><span class="line">                .removeHeader(<span class="string">"Pragma"</span>)<span class="comment">//去除不必要的协议头，避免出错</span></span><br><span class="line">               .removeHeader(<span class="string">"Cache-Control"</span>)</span><br><span class="line">               .header(<span class="string">"Cache-Control"</span>, <span class="string">"public, max-age=60"</span>)<span class="comment">//设置缓存超时时间，这里是60s</span></span><br><span class="line">               .build()</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//设置Cache目录以及缓存大小</span></span><br><span class="line"><span class="keyword">val</span> httpCacheDirectory = File(externalCacheDir, <span class="string">"cache_test"</span>)</span><br><span class="line"><span class="keyword">var</span> cache: Cache? = <span class="literal">null</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    cache = Cache(httpCacheDirectory, <span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>)</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">    Log.e(<span class="string">"OKHttp"</span>, <span class="string">"Could not create http cache"</span>, e)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//配置缓存以及网络拦截器</span></span><br><span class="line"><span class="keyword">val</span> okHttpClient = OkHttpClient.Builder()</span><br><span class="line">    .cache(cache)</span><br><span class="line">    .addNetworkInterceptor(interceptor)</span><br><span class="line">    .build()</span><br></pre></td></tr></table></figure>
+
+<p>关于第二点，无网络时，强制使用缓存，通过CacheInterceptor的itercept方法我们得知，缓存策略是通过request从缓存中获取响应体，那么我们的应用拦截器就可以派上用场了，当然前提是OKHttp已经帮你缓存过了；</p>
+<p>具体例子：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> interceptor: Interceptor = <span class="keyword">object</span> : Interceptor &#123;</span><br><span class="line">    <span class="meta">@Throws(IOException::class)</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">intercept</span><span class="params">(chain: <span class="type">Interceptor</span>.<span class="type">Chain</span>)</span></span>: Response? &#123;</span><br><span class="line">            <span class="keyword">var</span> request = chain.request()</span><br><span class="line">        <span class="keyword">if</span> (!checkNet(<span class="keyword">this</span><span class="symbol">@MainActivity</span>)) &#123;<span class="comment">//无网络时</span></span><br><span class="line">            request = request.newBuilder()</span><br><span class="line">                             .cacheControl(FORCE_CACHE)<span class="comment">//此处不设置过期时间</span></span><br><span class="line">                             .build()</span><br><span class="line">        &#125;</span><br><span class="line">      <span class="keyword">return</span> chain.proceed(request);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//设置Cache目录以及缓存大小</span></span><br><span class="line"><span class="keyword">val</span> httpCacheDirectory = File(externalCacheDir, <span class="string">"cache_test"</span>)</span><br><span class="line"><span class="keyword">var</span> cache: Cache? = <span class="literal">null</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    cache = Cache(httpCacheDirectory, <span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>)</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">    Log.e(<span class="string">"OKHttp"</span>, <span class="string">"Could not create http cache"</span>, e)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//配置缓存以及应用拦截器</span></span><br><span class="line"><span class="keyword">val</span> okHttpClient = OkHttpClient.Builder()</span><br><span class="line">    .cache(cache)</span><br><span class="line">    .addInterceptor(interceptor)</span><br><span class="line">    .build()</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/okhttp/" rel="tag"># okhttp</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/26/RetryAndFollowUpInterceptor%E9%87%8D%E8%AF%95%E4%B8%8E%E9%87%8D%E5%AE%9A%E5%90%91%E6%8B%A6%E6%88%AA%E5%99%A8/" rel="next" title="RetryAndFollowUpInterceptor重试与重定向拦截器">
+                <i class="fa fa-chevron-left"></i> RetryAndFollowUpInterceptor重试与重定向拦截器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Peng</p>
+              <p class="site-description motion-element" itemprop="description">小小Android攻城狮</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#构造方法"><span class="nav-number">1.</span> <span class="nav-text">构造方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#intercept"><span class="nav-number">2.</span> <span class="nav-text">intercept</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#思考："><span class="nav-number">4.</span> <span class="nav-text">思考：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Peng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共16.4k字</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
